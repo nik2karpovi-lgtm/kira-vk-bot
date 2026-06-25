@@ -61,31 +61,27 @@ function getSmartReply(text) {
 Чем могу помочь? Напиши что тебя интересует 🤍`;
 }
 
-// Основной webhook
 app.post('/webhook', async (req, res) => {
   const body = req.body;
   
-  // Подтверждение сервера VK
   if (body.type === 'confirmation') {
-    return res.send(CONFIRMATION_CODE);
+    return res.status(200).send(CONFIRMATION_CODE);
   }
   
-  // Новое сообщение
   if (body.type === 'message_new') {
     const message = body.object.message;
     const userId = message.from_id;
     const text = message.text || '';
     
-    // Не отвечаем самим себе
-    if (userId < 0) return res.send('ok');
+    if (userId < 0) return res.status(200).send('ok');
     
     const reply = getSmartReply(text);
     await sendMessage(userId, reply);
+    return res.status(200).send('ok');
   }
   
-  res.send('ok');
+  return res.status(200).send('ok');
 });
-
 // Healthcheck
 app.get('/', (req, res) => {
   res.send('🖤 Kira VK Bot — работает!');
